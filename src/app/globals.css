@@ -22,3 +22,14 @@ body {
   .no-print { display: none !important; }
   body { background: #fff; }
 }
+
+/* Data-viz tokens (single-series charts use slot 1 of the reference palette). */
+:root {
+  --viz-series-1: #2a78d6;
+  --viz-series-1-hover: #5598e7;
+  --viz-grid: #e5e7eb;
+  --viz-surface: #ffffff;
+  --viz-text-primary: #0f172a;
+  --viz-text-secondary: #475569;
+  --viz-text-muted: #64748b;
+}

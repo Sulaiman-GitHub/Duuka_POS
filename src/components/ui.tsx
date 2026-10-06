@@ -73,3 +73,23 @@ export function Alert({ tone = "error", children }: { tone?: "error" | "success"
 export const th = "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500";
 export const td = "px-4 py-3 text-sm";
 export const tdNum = "px-4 py-3 text-sm text-right whitespace-nowrap tabular-nums";
+
+export function StatTile({
+  label, value, sub, delta, tone,
+}: { label: string; value: string; sub?: string; delta?: { pct: number | null; vs: string }; tone?: "red" | "amber" }) {
+  const up = delta?.pct != null && delta.pct >= 0;
+  return (
+    <Card className="p-4">
+      <div className="text-sm text-slate-500">{label}</div>
+      <div className={clsx("mt-1 text-2xl font-semibold tracking-tight", tone === "red" && "text-red-600", tone === "amber" && "text-amber-600")}>{value}</div>
+      {delta && (
+        <div className="mt-1 text-xs text-slate-500">
+          {delta.pct === null ? <span>No sales {delta.vs}</span> : (
+            <span className={up ? "text-emerald-700" : "text-red-600"}>{up ? "▲" : "▼"} {Math.abs(delta.pct).toFixed(0)}%<span className="text-slate-500"> vs {delta.vs}</span></span>
+          )}
+        </div>
+      )}
+      {sub && <div className="mt-1 text-xs text-slate-500">{sub}</div>}
+    </Card>
+  );
+}
