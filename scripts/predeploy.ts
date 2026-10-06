@@ -5,13 +5,14 @@
 // With no DATABASE_URL (e.g. a preview build with no database attached) it just generates the client and skips the rest.
 import "dotenv/config";
 import { execSync } from "node:child_process";
+import { databaseUrl } from "../src/lib/db-url";
 
 const run = (cmd: string, env: Record<string, string> = {}) => execSync(cmd, { stdio: "inherit", env: { ...process.env, ...env } });
 
 run("npx prisma generate");
 
-if (!process.env.DATABASE_URL) {
-  console.log("[predeploy] DATABASE_URL is not set - skipping migrations and seed.");
+if (!databaseUrl()) {
+  console.log("[predeploy] No database URL is set - skipping migrations and seed.");
 } else {
   console.log("[predeploy] Applying migrations...");
   run("npx prisma migrate deploy");

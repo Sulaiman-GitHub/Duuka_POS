@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
+import { directDatabaseUrl } from "./src/lib/db-url";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -9,6 +10,6 @@ export default defineConfig({
   },
   datasource: {
     // Migrations should use a direct (non-pooled) connection when the host provides one (Neon does).
-    url: process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL ?? "",
+    url: directDatabaseUrl(),
   },
 });
