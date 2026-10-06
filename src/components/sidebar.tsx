@@ -35,13 +35,13 @@ export function Sidebar({ items, user }: { items: { href: string; label: string;
   return (
     <>
       <div className="no-print flex items-center justify-between bg-slate-900 px-4 py-3 text-white lg:hidden">
-        <span className="font-semibold">DVN POS</span>
+        <span className="font-semibold">Duuka POS</span>
         <button aria-label="Toggle menu" onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</button>
       </div>
       <aside className={clsx("no-print fixed inset-y-0 left-0 z-30 flex w-64 flex-col bg-slate-900 text-white transition-transform lg:static lg:translate-x-0", open ? "translate-x-0 top-12" : "-translate-x-full")}>
         <div className="hidden items-center gap-3 border-b border-slate-800 px-5 py-5 lg:flex">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-500 font-bold">P</div>
-          <span className="text-lg font-semibold">DVN POS</span>
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-500 font-bold">D</div>
+          <span className="text-lg font-semibold">Duuka POS</span>
         </div>
         {nav}
         <div className="border-t border-slate-800 p-4">

@@ -32,6 +32,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<"/
         {sp.new && <div className="basis-full"><Alert tone="success">Sale completed successfully.</Alert></div>}
         <PrintButton />
         {can(user.role, "pos.sell") && <Link href="/pos" className="inline-flex items-center rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600">New sale</Link>}
+        {can(user.role, "sales.refund") && sale.status !== "REFUNDED" && <Link href={`/sales/${sale.id}/return`} className="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Return / refund</Link>}
         <Link href="/sales" className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100">All sales</Link>
       </div>
 

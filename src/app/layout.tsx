@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "DVN POS", template: "%s · DVN POS" },
+  title: { default: "Duuka POS", template: "%s · Duuka POS" },
   description: "Web-based point of sale, inventory and reporting system",
 };
 
