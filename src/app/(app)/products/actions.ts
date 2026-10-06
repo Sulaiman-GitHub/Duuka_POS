@@ -16,6 +16,13 @@ const echo = (fd: FormData): Record<string, string> =>
 const MAX_IMAGE = 500 * 1024;
 const IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
+function sniffImageType(b: Uint8Array): string | null {
+  if (b.length > 8 && b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47) return "image/png";
+  if (b.length > 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return "image/jpeg";
+  if (b.length > 12 && String.fromCharCode(...b.slice(0, 4)) === "RIFF" && String.fromCharCode(...b.slice(8, 12)) === "WEBP") return "image/webp";
+  return null;
+}
+
 const int = (label: string, min = 0) =>
   z.coerce.number({ message: `${label} must be a number` }).int(`${label} must be a whole number`).min(min, `${label} cannot be below ${min}`);
 
@@ -47,7 +54,11 @@ async function readImage(formData: FormData): Promise<{ data: Uint8Array<ArrayBu
   if (!(file instanceof File) || file.size === 0) return null;
   if (!IMAGE_TYPES.includes(file.type)) return { error: "Image must be PNG, JPEG or WebP." };
   if (file.size > MAX_IMAGE) return { error: "Image must be 500 KB or smaller." };
-  return { data: new Uint8Array(await file.arrayBuffer()), type: file.type };
+  const data = new Uint8Array(await file.arrayBuffer());
+  // The browser-declared type is client-controlled, so trust the file's own signature instead.
+  const type = sniffImageType(data);
+  if (!type) return { error: "That file isn't a valid PNG, JPEG or WebP image." };
+  return { data, type };
 }
 
 function newSku() {
