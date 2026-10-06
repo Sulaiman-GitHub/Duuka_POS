@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Alert, Badge } from "@/components/ui";
-import { business } from "@/lib/business";
+import { getSettings } from "@/lib/settings";
 import { db } from "@/lib/db";
 import { pageGuard } from "@/lib/guard";
 import { formatUGX } from "@/lib/money";
@@ -18,6 +18,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<"/
   const user = await pageGuard("sales.view");
   const { id } = await params;
   const sp = await searchParams;
+  const business = await getSettings();
   const sale = await db.sale.findUnique({
     where: { id },
     include: { cashier: { select: { name: true } }, items: { orderBy: { productName: "asc" } }, returns: { select: { refundTotal: true, createdAt: true, reason: true } } },
@@ -70,7 +71,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<"/
           {sale.note && <div className="flex justify-between"><dt>Ref</dt><dd>{sale.note}</dd></div>}
           {refunded > 0 && <div className="flex justify-between text-red-600"><dt>Refunded</dt><dd>− {formatUGX(refunded)}</dd></div>}
         </dl>
-        <p className="mt-5 text-center text-xs text-slate-600">{business.footer}</p>
+        <p className="mt-5 text-center text-xs text-slate-600">{business.receiptFooter}</p>
       </article>
     </div>
   );

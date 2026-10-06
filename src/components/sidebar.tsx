@@ -1,13 +1,13 @@
 "use client";
 
 import clsx from "clsx";
-import { BarChart3, Boxes, LayoutDashboard, LogOut, Menu, Package, Receipt, ShoppingCart, Truck, Users, X } from "lucide-react";
+import { BarChart3, Boxes, History, LayoutDashboard, LogOut, Menu, Package, Receipt, Settings, ShoppingCart, Truck, Users, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { logout } from "@/app/login/actions";
 
-const icons = { LayoutDashboard, ShoppingCart, Receipt, Package, Boxes, Truck, BarChart3, Users };
+const icons = { LayoutDashboard, ShoppingCart, Receipt, Package, Boxes, Truck, BarChart3, Users, History, Settings };
 
 export function Sidebar({ items, user }: { items: { href: string; label: string; icon: string }[]; user: { name: string; role: string } }) {
   const pathname = usePathname();

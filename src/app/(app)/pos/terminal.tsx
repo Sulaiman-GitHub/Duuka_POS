@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Alert, Button, inputCls } from "@/components/ui";
 import { formatUGX } from "@/lib/money";
 import { completeSale } from "./actions";
+import { useHeldSales, type HeldSale } from "./held";
 
 type Product = { id: string; name: string; sku: string; barcode: string | null; sellPrice: number; stock: number; categoryId: string | null; hasImage: boolean };
 type Method = "CASH" | "MOBILE_MONEY" | "CARD" | "BANK_TRANSFER";
@@ -33,6 +34,7 @@ export function PosTerminal({ products, categories, maxDiscountPercent }: { prod
   const [customerPhone, setCustomerPhone] = useState("");
   const [error, setError] = useState<string>();
   const [pending, start] = useTransition();
+  const { held, hold, remove: removeHeld } = useHeldSales();
 
   const byId = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
   const lines = Object.entries(cart).map(([id, quantity]) => ({ p: byId.get(id)!, quantity })).filter((l) => l.p);
@@ -69,6 +71,20 @@ export function PosTerminal({ products, categories, maxDiscountPercent }: { prod
   function clearAll() {
     setCart({}); setDiscountValue(""); setTendered(""); setReference(""); setCustomerName(""); setCustomerPhone(""); setError(undefined);
     searchRef.current?.focus();
+  }
+
+  function holdSale() {
+    if (lines.length === 0) return;
+    hold({ cart, discountType, discountValue, customerName, customerPhone });
+    clearAll();
+  }
+  function resume(h: HeldSale) {
+    if (lines.length > 0 && !confirm("Replace the sale you are working on? It will not be saved.")) return;
+    // Only restore products that still exist; stock is re-checked by the server when the sale is completed.
+    setCart(Object.fromEntries(Object.entries(h.cart).filter(([id]) => byId.has(id))));
+    setDiscountType(h.discountType); setDiscountValue(h.discountValue); setCustomerName(h.customerName); setCustomerPhone(h.customerPhone);
+    setTendered(""); setError(undefined);
+    removeHeld(h.id);
   }
 
   function onSearchKey(e: React.KeyboardEvent) {
@@ -109,7 +125,7 @@ export function PosTerminal({ products, categories, maxDiscountPercent }: { prod
   const quick = total > 0 ? [...new Set([total, Math.ceil(total / 1000) * 1000, Math.ceil(total / 5000) * 5000, Math.ceil(total / 10000) * 10000, Math.ceil(total / 50000) * 50000])].slice(0, 4) : [];
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[1fr_26rem]">
+    <div className="grid gap-4 pb-20 xl:grid-cols-[1fr_26rem] xl:pb-0">
       <section className="min-w-0">
         <div className="relative mb-3">
           <Search className="pointer-events-none absolute left-3 top-2.5 text-slate-400" size={18} />
@@ -140,11 +156,34 @@ export function PosTerminal({ products, categories, maxDiscountPercent }: { prod
         </div>
       </section>
 
-      <aside className="h-fit rounded-xl border border-slate-200 bg-white shadow-sm xl:sticky xl:top-6">
+      <aside id="cart" className="h-fit scroll-mt-4 rounded-xl border border-slate-200 bg-white shadow-sm xl:sticky xl:top-6">
         <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
           <h2 className="font-semibold">Current sale</h2>
-          {lines.length > 0 && <button onClick={clearAll} className="text-sm text-red-600 hover:underline">Clear</button>}
+          <div className="flex items-center gap-3 text-sm">
+            {lines.length > 0 && <button onClick={holdSale} className="text-brand-600 hover:underline">Hold</button>}
+            {lines.length > 0 && <button onClick={clearAll} className="text-red-600 hover:underline">Clear</button>}
+          </div>
         </div>
+        {held.length > 0 && (
+          <details className="border-b border-slate-200 bg-amber-50/60 px-4 py-2 text-sm">
+            <summary className="cursor-pointer font-medium text-amber-800">Held sales ({held.length})</summary>
+            <ul className="mt-2 space-y-1.5">
+              {held.map((h) => {
+                const n = Object.values(h.cart).reduce((a, b) => a + b, 0);
+                const sum = Object.entries(h.cart).reduce((t, [id, q]) => t + (byId.get(id)?.sellPrice ?? 0) * q, 0);
+                return (
+                  <li key={h.id} className="flex items-center justify-between gap-2">
+                    <span className="min-w-0 truncate">{h.customerName || "Walk-in"} · {n} item{n === 1 ? "" : "s"} · {formatUGX(sum)}</span>
+                    <span className="flex shrink-0 gap-2">
+                      <button onClick={() => resume(h)} className="text-brand-600 hover:underline">Resume</button>
+                      <button onClick={() => { if (confirm("Discard this held sale?")) removeHeld(h.id); }} className="text-red-600 hover:underline">Discard</button>
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </details>
+        )}
         <div className="max-h-72 divide-y divide-slate-100 overflow-y-auto">
           {lines.map(({ p, quantity }) => (
             <div key={p.id} className="flex items-center gap-2 px-4 py-2.5">
@@ -206,6 +245,12 @@ export function PosTerminal({ products, categories, maxDiscountPercent }: { prod
           <Button onClick={pay} disabled={!canPay} className="w-full !py-3 text-base">{pending ? "Processing…" : `Complete sale · ${formatUGX(total)} (F9)`}</Button>
         </div>
       </aside>
+      {lines.length > 0 && (
+        <div className="no-print fixed inset-x-0 bottom-0 z-20 flex items-center justify-between gap-3 border-t border-slate-200 bg-white px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.08)] xl:hidden">
+          <div><div className="text-xs text-slate-500">{lines.reduce((a, l) => a + l.quantity, 0)} items</div><div className="text-lg font-semibold">{formatUGX(total)}</div></div>
+          <Button onClick={() => document.getElementById("cart")?.scrollIntoView({ behavior: "smooth" })}>Review &amp; pay</Button>
+        </div>
+      )}
     </div>
   );
 }

@@ -53,7 +53,7 @@ function DataTable({ head, rows }: { head: string[]; rows: (string | number)[][]
 
 export function ChartCard({ title, subtitle, toolbar, children }: { title: string; subtitle?: string; toolbar?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <section className="min-w-0 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
           <h2 className="font-semibold">{title}</h2>
@@ -70,7 +70,7 @@ export function ChartCard({ title, subtitle, toolbar, children }: { title: strin
 export function TrendChart({ title, subtitle, seriesName, data }: { title: string; subtitle?: string; seriesName: string; data: { label: string; value: number }[] }) {
   const [view, setView] = useState<"chart" | "table">("chart");
   const wrap = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(640);
+  const [width, setWidth] = useState(300);
   const [hover, setHover] = useState<number | null>(null);
 
   useEffect(() => {
@@ -90,7 +90,9 @@ export function TrendChart({ title, subtitle, seriesName, data }: { title: strin
   const line = data.map((d, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(d.value).toFixed(1)}`).join("");
   const area = n ? `${line}L${x(n - 1).toFixed(1)},${y(0)}L${x(0).toFixed(1)},${y(0)}Z` : "";
   const yTicks = Array.from({ length: 5 }, (_, i) => i * step);
-  const xTickIdx = n <= 7 ? data.map((_, i) => i) : Array.from({ length: 6 }, (_, i) => Math.round((i * (n - 1)) / 5));
+  // Fewer date labels on narrow charts so they never collide.
+  const maxTicks = iw < 260 ? 2 : iw < 420 ? 3 : 6;
+  const xTickIdx = n <= maxTicks ? data.map((_, i) => i) : Array.from({ length: maxTicks }, (_, i) => Math.round((i * (n - 1)) / (maxTicks - 1)));
 
   const total = data.reduce((s, d) => s + d.value, 0);
   const active = hover !== null ? data[hover] : null;

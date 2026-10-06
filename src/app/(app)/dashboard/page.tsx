@@ -65,7 +65,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
-        <div className="xl:col-span-2">
+        <div className="min-w-0 xl:col-span-2">
           <TrendChart title="Sales over time" seriesName="Net sales"
             subtitle={`${formatUGX(r.net)} net sales · ${formatNumber(r.transactions)} transactions · ${formatUGX(r.profit)} gross profit (${rangeLabel})`}
             data={daily.map((d) => ({ label: d.key, value: d.net }))} />
@@ -73,7 +73,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         <BarList title="Best-selling products" subtitle={`Units sold, ${rangeLabel}`} valueName="Units sold" unit="units"
           items={top.map((p) => ({ label: p.name, value: p.units, note: `${formatUGX(p.revenue)} revenue` }))} />
         <BarList title="Sales by payment method" subtitle={`Net sales, ${rangeLabel}`} valueName="Net sales" showShare items={byMethod} />
-        <div className="xl:col-span-2">
+        <div className="min-w-0 xl:col-span-2">
           <Card className="p-5">
             <div className="mb-3 flex items-center justify-between">
               <div><h2 className="font-semibold">Needs restocking</h2><p className="text-sm text-slate-500">Products at or below their minimum level</p></div>

@@ -97,16 +97,16 @@ model Product {
 }
 
 model StockMovement {
-  id            String            @id @default(cuid())
-  productId     String
-  type          StockMovementType
+  id         String            @id @default(cuid())
+  productId  String
+  type       StockMovementType
   // Signed: positive adds stock, negative removes it.
-  quantity      Int
-  stockAfter    Int
-  reason        String?
-  reference     String?
-  userId        String?
-  createdAt     DateTime          @default(now())
+  quantity   Int
+  stockAfter Int
+  reason     String?
+  reference  String?
+  userId     String?
+  createdAt  DateTime          @default(now())
 
   product Product @relation(fields: [productId], references: [id])
   user    User?   @relation(fields: [userId], references: [id])
@@ -115,20 +115,20 @@ model StockMovement {
 }
 
 model Sale {
-  id            String         @id @default(cuid())
-  receiptNo     String         @unique
+  id            String        @id @default(cuid())
+  receiptNo     String        @unique
   cashierId     String
   customerName  String?
   customerPhone String?
   subtotal      Int
-  discount      Int            @default(0)
+  discount      Int           @default(0)
   total         Int
   paymentMethod PaymentMethod
   amountPaid    Int
-  changeGiven   Int            @default(0)
-  status        SaleStatus     @default(COMPLETED)
+  changeGiven   Int           @default(0)
+  status        SaleStatus    @default(COMPLETED)
   note          String?
-  createdAt     DateTime       @default(now())
+  createdAt     DateTime      @default(now())
 
   cashier User         @relation(fields: [cashierId], references: [id])
   items   SaleItem[]
@@ -168,9 +168,9 @@ model SaleReturn {
   refundTotal Int
   createdAt   DateTime @default(now())
 
-  sale   Sale             @relation(fields: [saleId], references: [id])
-  user   User             @relation(fields: [processedBy], references: [id])
-  items  SaleReturnItem[]
+  sale  Sale             @relation(fields: [saleId], references: [id])
+  user  User             @relation(fields: [processedBy], references: [id])
+  items SaleReturnItem[]
 
   @@index([saleId])
 }
@@ -199,16 +199,16 @@ model Supplier {
 }
 
 model PurchaseOrder {
-  id         String              @id @default(cuid())
-  poNumber   String              @unique
-  supplierId String
-  status     PurchaseOrderStatus @default(DRAFT)
-  total      Int                 @default(0)
-  note       String?
-  invoiceNo  String?
+  id          String              @id @default(cuid())
+  poNumber    String              @unique
+  supplierId  String
+  status      PurchaseOrderStatus @default(DRAFT)
+  total       Int                 @default(0)
+  note        String?
+  invoiceNo   String?
   createdById String
-  createdAt  DateTime            @default(now())
-  receivedAt DateTime?
+  createdAt   DateTime            @default(now())
+  receivedAt  DateTime?
 
   supplier  Supplier            @relation(fields: [supplierId], references: [id])
   createdBy User                @relation(fields: [createdById], references: [id])
@@ -227,6 +227,17 @@ model PurchaseOrderItem {
   product Product       @relation(fields: [productId], references: [id])
 }
 
+// Single-row table (id = "main") holding shop-wide settings an admin can edit.
+model ShopSettings {
+  id                        String   @id @default("main")
+  name                      String
+  address                   String
+  phone                     String
+  receiptFooter             String
+  cashierMaxDiscountPercent Int      @default(10)
+  updatedAt                 DateTime @updatedAt
+}
+
 model AuditLog {
   id        String   @id @default(cuid())
   userId    String?
@@ -239,4 +250,5 @@ model AuditLog {
   user User? @relation(fields: [userId], references: [id])
 
   @@index([createdAt])
+  @@index([action, createdAt])
 }

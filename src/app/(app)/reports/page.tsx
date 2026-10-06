@@ -3,9 +3,9 @@ import clsx from "clsx";
 import { Download } from "lucide-react";
 import Link from "next/link";
 import { Button, Card, PageHeader, inputCls } from "@/components/ui";
-import { business } from "@/lib/business";
 import { pageGuard } from "@/lib/guard";
 import { formatNumber, formatUGX } from "@/lib/money";
+import { getSettings } from "@/lib/settings";
 import { REPORT_TYPES, buildReport, parseReportParams, type Col } from "@/lib/reports";
 import { addDays, formatDateTime, kampalaDateString, startOfKampalaDay } from "@/lib/time";
 import { PrintButton } from "./print-button";
@@ -23,7 +23,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
   const sp = await searchParams;
   const p = parseReportParams(sp);
   const meta = REPORT_TYPES.find((t) => t.key === p.type)!;
-  const report = await buildReport(p);
+  const [report, business] = await Promise.all([buildReport(p), getSettings()]);
 
   const today = startOfKampalaDay();
   const presets = [

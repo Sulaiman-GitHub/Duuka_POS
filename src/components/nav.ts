@@ -9,4 +9,6 @@ export const NAV: { href: string; label: string; perm: Permission; icon: string 
   { href: "/suppliers", label: "Suppliers & Orders", perm: "suppliers.manage", icon: "Truck" },
   { href: "/reports", label: "Reports", perm: "reports.view", icon: "BarChart3" },
   { href: "/users", label: "Users", perm: "users.manage", icon: "Users" },
+  { href: "/audit", label: "Activity log", perm: "audit.view", icon: "History" },
+  { href: "/settings", label: "Settings", perm: "settings.manage", icon: "Settings" },
 ];

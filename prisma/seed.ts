@@ -30,7 +30,7 @@ async function main() {
   }
   console.log("Resetting data…");
   await db.$transaction([
-    db.auditLog.deleteMany(), db.saleReturnItem.deleteMany(), db.saleReturn.deleteMany(),
+    db.auditLog.deleteMany(), db.shopSettings.deleteMany(), db.saleReturnItem.deleteMany(), db.saleReturn.deleteMany(),
     db.saleItem.deleteMany(), db.sale.deleteMany(), db.stockMovement.deleteMany(),
     db.purchaseOrderItem.deleteMany(), db.purchaseOrder.deleteMany(), db.supplier.deleteMany(),
     db.product.deleteMany(), db.category.deleteMany(), db.user.deleteMany(),

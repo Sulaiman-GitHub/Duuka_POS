@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Badge, Card } from "@/components/ui";
-import { business } from "@/lib/business";
+import { getSettings } from "@/lib/settings";
 import { db } from "@/lib/db";
 import { pageGuard } from "@/lib/guard";
 import { formatUGX } from "@/lib/money";
@@ -16,6 +16,7 @@ export const metadata: Metadata = { title: "Purchase order" };
 export default async function OrderPage({ params }: PageProps<"/suppliers/orders/[id]">) {
   await pageGuard("suppliers.manage");
   const { id } = await params;
+  const business = await getSettings();
   const po = await db.purchaseOrder.findUnique({ where: { id }, include: { supplier: true, createdBy: { select: { name: true } }, items: { include: { product: { select: { name: true, sku: true } } }, orderBy: { product: { name: "asc" } } } } });
   if (!po) notFound();
   const canReceive = po.status === "ORDERED" && po.items.some((i) => i.receivedQty < i.quantity);

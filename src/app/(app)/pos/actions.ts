@@ -3,10 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { audit } from "@/lib/audit";
-import { CASHIER_MAX_DISCOUNT_PERCENT } from "@/lib/business";
 import { db } from "@/lib/db";
 import { applyStockChange, StockError } from "@/lib/inventory";
 import { requirePermission } from "@/lib/session";
+import { getSettings } from "@/lib/settings";
 import { kampalaDateString } from "@/lib/time";
 
 const schema = z.object({
@@ -34,6 +34,7 @@ export async function completeSale(input: unknown): Promise<SaleResult> {
   const parsed = schema.safeParse(input);
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const d = parsed.data;
+  const { cashierMaxDiscountPercent } = await getSettings();
 
   // Merge duplicate lines so stock is checked against the combined quantity.
   const qty = new Map<string, number>();
@@ -55,8 +56,8 @@ export async function completeSale(input: unknown): Promise<SaleResult> {
 
         const rawDiscount = d.discountType === "percent" ? Math.round((subtotal * d.discountValue) / 100) : Math.round(d.discountValue);
         if (rawDiscount > subtotal) throw new StockError("Discount cannot exceed the subtotal.");
-        if (user.role === "CASHIER" && rawDiscount > (subtotal * CASHIER_MAX_DISCOUNT_PERCENT) / 100)
-          throw new StockError(`Cashiers can give at most ${CASHIER_MAX_DISCOUNT_PERCENT}% discount. Ask a manager to approve more.`);
+        if (user.role === "CASHIER" && rawDiscount > (subtotal * cashierMaxDiscountPercent) / 100)
+          throw new StockError(`Cashiers can give at most ${cashierMaxDiscountPercent}% discount. Ask a manager to approve more.`);
         const discount = rawDiscount;
         const total = subtotal - discount;
 
