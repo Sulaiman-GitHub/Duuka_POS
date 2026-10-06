@@ -74,7 +74,9 @@ model Product {
   barcode     String?  @unique
   name        String
   description String?
-  imageUrl    String?
+  // Images live in the DB (served by /api/products/[id]/image) because serverless hosts have no persistent disk.
+  imageData   Bytes?
+  imageType   String?
   categoryId  String?
   // Money is stored as whole UGX (integers) to avoid floating point errors.
   costPrice   Int
