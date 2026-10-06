@@ -205,6 +205,7 @@ model PurchaseOrder {
   status     PurchaseOrderStatus @default(DRAFT)
   total      Int                 @default(0)
   note       String?
+  invoiceNo  String?
   createdById String
   createdAt  DateTime            @default(now())
   receivedAt DateTime?

@@ -87,6 +87,7 @@ async function main() {
       const method = pick(methods);
       const paid = method === "CASH" ? Math.ceil(total / 1000) * 1000 : total;
       const at = daysAgo(d, 8 + Math.floor(rand() * 11), Math.floor(rand() * 60));
+      if (at > new Date()) continue; // never create sales timestamped in the future
       const no = `RCP-${at.toISOString().slice(0, 10).replace(/-/g, "")}-${String(receipt++).padStart(4, "0")}`;
       const cashier = pick(cashiers);
       await db.sale.create({
