@@ -23,6 +23,10 @@ const CATALOG: Record<string, [string, number, number][]> = {
 };
 
 async function main() {
+  if (process.env.SEED_IF_EMPTY && (await db.user.count()) > 0) {
+    console.log("Database already has data - skipping seed.");
+    return;
+  }
   console.log("Resetting data…");
   await db.$transaction([
     db.auditLog.deleteMany(), db.saleReturnItem.deleteMany(), db.saleReturn.deleteMany(),
