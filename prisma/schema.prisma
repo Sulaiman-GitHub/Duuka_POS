@@ -227,6 +227,12 @@ model PurchaseOrderItem {
   product Product       @relation(fields: [productId], references: [id])
 }
 
+// One row per Kampala day; incremented atomically so concurrent sales never collide on a receipt number.
+model ReceiptCounter {
+  day  String @id // yyyy-mm-dd
+  last Int
+}
+
 // Single-row table (id = "main") holding shop-wide settings an admin can edit.
 model ShopSettings {
   id                        String   @id @default("main")
