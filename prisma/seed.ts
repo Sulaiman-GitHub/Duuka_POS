@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { databaseUrl } from "../src/lib/db-url";
+import { CATALOG } from "./catalog";
+import { productImage } from "./images";
 import type { PaymentMethod } from "../src/generated/prisma/enums";
 
 const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: databaseUrl() }) });
@@ -11,17 +13,6 @@ const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: database
 let seed = 42;
 const rand = () => ((seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296);
 const pick = <T,>(a: T[]) => a[Math.floor(rand() * a.length)];
-
-const CATALOG: Record<string, [string, number, number][]> = {
-  "Beverages": [["Mineral Water 500ml", 600, 1000], ["Mineral Water 1.5L", 1100, 1800], ["Coca-Cola 500ml", 1200, 2000], ["Fanta Orange 500ml", 1200, 2000], ["Passion Juice 1L", 3000, 4500], ["Tusker Lager 500ml", 3200, 4500], ["Milk 500ml", 1300, 1800]],
-  "Groceries": [["Sugar 1kg", 4200, 5500], ["Rice 1kg", 4000, 5200], ["Cooking Oil 1L", 7500, 9500], ["Wheat Flour 1kg", 3500, 4500], ["Salt 500g", 800, 1200], ["Spaghetti 500g", 2500, 3500], ["Tea Leaves 100g", 1800, 2800], ["Eggs (tray of 30)", 11000, 14000]],
-  "Bakery": [["Bread (sliced)", 3200, 4200], ["Chapati (5 pack)", 2500, 4000], ["Buns (6 pack)", 3000, 4500], ["Cake Slice", 2000, 3500]],
-  "Personal Care": [["Bathing Soap", 1800, 2800], ["Toothpaste 100ml", 3500, 5000], ["Body Lotion 400ml", 8000, 12000], ["Sanitary Pads", 3000, 4500], ["Roll-on Deodorant", 4500, 7000], ["Shampoo 250ml", 6000, 9000]],
-  "Household": [["Laundry Detergent 1kg", 6500, 9000], ["Dish Soap 500ml", 3000, 4500], ["Toilet Paper (4 roll)", 4000, 6000], ["Matchbox", 300, 500], ["Candles (6 pack)", 2500, 4000], ["Bleach 750ml", 3500, 5000]],
-  "Stationery": [["Exercise Book 96pg", 1000, 1800], ["Ball Pen (blue)", 400, 800], ["Pencil HB", 300, 600], ["A4 Paper (ream)", 15000, 20000]],
-  "Electronics": [["Phone Charger USB-C", 8000, 15000], ["Earphones", 6000, 12000], ["Torch (rechargeable)", 12000, 20000], ["AA Batteries (4 pack)", 3500, 6000], ["Power Bank 10000mAh", 35000, 55000]],
-  "Snacks": [["Biscuits Pack", 1500, 2500], ["Crisps 50g", 1000, 1800], ["Chocolate Bar", 2000, 3500], ["Roasted Groundnuts", 1500, 2500]],
-};
 
 async function main() {
   if (process.env.SEED_IF_EMPTY && (await db.user.count()) > 0) {
@@ -58,7 +49,7 @@ async function main() {
       const sku = `SKU-${String(n++).padStart(4, "0")}`;
       const stock = 150 + Math.floor(rand() * 150);
       const p = await db.product.create({
-        data: { sku, barcode: `600${String(100000 + n * 37).padStart(9, "0")}`, name, categoryId: category.id, costPrice: cost, sellPrice: price, stock, minStock: 15 },
+        data: { sku, barcode: `600${String(100000 + n * 37).padStart(9, "0")}`, name, categoryId: category.id, costPrice: cost, sellPrice: price, stock, minStock: 15, ...productImage(name) },
       });
       await db.stockMovement.create({ data: { productId: p.id, type: "INITIAL", quantity: stock, stockAfter: stock, reason: "Opening stock", userId: admin.id, createdAt: daysAgo(61) } });
       products.push({ id: p.id, name, sku, cost, price, stock });

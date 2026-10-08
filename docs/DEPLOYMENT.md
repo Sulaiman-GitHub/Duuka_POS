@@ -27,7 +27,8 @@
 5. **Open the URL** and sign in with a [demo account](../README.md#try-it).
 
 From then on, every push to the production branch migrates the database and redeploys automatically. Demo data is only
-loaded into an *empty* database, so real data is never overwritten.
+loaded into an *empty* database, so real data is never overwritten. Each deploy also gives demo products that have
+**no image** their illustration; products that already have an image (for example one you uploaded) are left alone.
 
 ### Optional environment variables
 
@@ -44,6 +45,9 @@ To remove test sales and reload the demo data for a presentation:
 1. Add the environment variable `RESET_DEMO_DATA` with the exact value `YES-DELETE-EVERYTHING`.
 2. Redeploy. The build log will show a warning and the database is wiped and re-seeded.
 3. **Immediately delete the variable** — while it is set, *every* deploy wipes the data.
+
+> The reset also deletes any product photos that were uploaded through the app, and reloads the demo illustrations. Skip it
+> if you want to keep them.
 
 ### Production checklist
 

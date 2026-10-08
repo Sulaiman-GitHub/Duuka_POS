@@ -118,6 +118,9 @@ analytics are loaded.
 
 - Demo passwords are public on purpose so judges can sign in; use real, private credentials for a real shop.
 - Product images are stored in the database (the host has no persistent disk); they are limited to 500 KB each.
+- The demo products' pictures are **original illustrations** drawn in code (see [`tools/product-images`](tools/product-images)),
+  not photographs, and contain no brand logos. Upload a real photo on any product's *Edit* page to replace one; the
+  deploy step only fills in products that have **no** image, so your own photos are never overwritten.
 - *Parked sales* are saved in the cashier's browser, so they stay on that device.
 - "PDF export" uses the browser's *Save as PDF* from a print-styled page; CSV is generated on the server.
 - `npm audit` reports advisories inside Prisma's **command-line tooling** (build-time only, not part of the running
@@ -126,4 +129,4 @@ analytics are loaded.
 ## AI disclosure
 
 This project was built with the assistance of an AI coding assistant (Claude) working in the repository under the
-author's direction. The author directed the work, chose the product scope, tested the live deployment, and operates it.
+author's direction. That includes the demo product illustrations, which were drawn in code by the assistant. The author directed the work, chose the product scope, tested the live deployment, and operates it.

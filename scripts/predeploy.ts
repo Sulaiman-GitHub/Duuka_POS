@@ -3,6 +3,7 @@
 //   2. apply pending migrations
 //   3. load demo data, but only into an EMPTY database (never overwrites real data),
 //      unless RESET_DEMO_DATA=YES-DELETE-EVERYTHING is set for a deliberate one-off reset
+//   4. give demo products their illustrations (only those without an image)
 // With no DATABASE_URL (e.g. a preview build with no database attached) it just generates the client and skips the rest.
 import "dotenv/config";
 import { execSync } from "node:child_process";
@@ -24,4 +25,5 @@ if (!databaseUrl()) {
     console.log("[predeploy] Seeding demo data if the database is empty...");
     run("npx tsx prisma/seed.ts", { SEED_IF_EMPTY: "1" });
   }
+  run("npx tsx scripts/attach-product-images.ts"); // fills in only products that have no image
 }

@@ -143,9 +143,9 @@ export function PosTerminal({ products, categories, maxDiscountPercent }: { prod
               className="flex flex-col rounded-xl border border-slate-200 bg-white p-3 text-left shadow-sm transition hover:border-brand-500 hover:shadow disabled:cursor-not-allowed disabled:opacity-50">
               {p.hasImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={`/api/products/${p.id}/image`} alt="" loading="lazy" className="mb-2 h-20 w-full rounded-lg object-cover" />
+                <img src={`/api/products/${p.id}/image`} alt="" loading="lazy" className="mb-2 aspect-[3/2] w-full rounded-lg object-cover" />
               ) : (
-                <div className="mb-2 flex h-20 w-full items-center justify-center rounded-lg bg-slate-100 text-lg font-semibold text-slate-400">{p.name.slice(0, 2).toUpperCase()}</div>
+                <div className="mb-2 flex aspect-[3/2] w-full items-center justify-center rounded-lg bg-slate-100 text-lg font-semibold text-slate-400">{p.name.slice(0, 2).toUpperCase()}</div>
               )}
               <span className="line-clamp-2 min-h-[2.5rem] text-sm font-medium">{p.name}</span>
               <span className="mt-1 text-sm font-semibold text-brand-600">{formatUGX(p.sellPrice)}</span>

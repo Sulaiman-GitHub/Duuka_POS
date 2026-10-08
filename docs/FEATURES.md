@@ -24,7 +24,7 @@ browser tests; ➕ = goes beyond the brief.
 | Assign categories | ✅ — category management page |
 | Buying cost · selling price | ✅ — warns before saving a price below cost |
 | Stock quantity · minimum stock level | ✅ |
-| Product images | ✅ — PNG/JPEG/WebP ≤ 500 KB, validated by file signature |
+| Product images | ✅ — PNG/JPEG/WebP ≤ 500 KB, validated by file signature; shown in the POS grid and product list. The 44 demo products ship with original illustrations |
 | SKUs / product codes | ✅ — auto-generated if blank; ➕ barcode field for scanners |
 
 ## 3. Inventory management
